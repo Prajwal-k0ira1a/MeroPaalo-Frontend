@@ -20,9 +20,30 @@ export default function CountersPage() {
       adminApi.getUsers("admin"),
     ]);
 
-    setDepartments(deptList || []);
-    setCounters(counterList || []);
-    const merged = [...(staffList || []), ...(adminList || [])];
+    const departmentsArr = Array.isArray(deptList)
+      ? deptList
+      : Array.isArray(deptList?.departments)
+        ? deptList.departments
+        : [];
+    const countersArr = Array.isArray(counterList)
+      ? counterList
+      : Array.isArray(counterList?.counters)
+        ? counterList.counters
+        : [];
+    const staffArr = Array.isArray(staffList)
+      ? staffList
+      : Array.isArray(staffList?.users)
+        ? staffList.users
+        : [];
+    const adminArr = Array.isArray(adminList)
+      ? adminList
+      : Array.isArray(adminList?.users)
+        ? adminList.users
+        : [];
+
+    setDepartments(departmentsArr);
+    setCounters(countersArr);
+    const merged = [...staffArr, ...adminArr];
     setStaffUsers(
       merged.filter(
         (u, idx, arr) => idx === arr.findIndex((x) => x._id === u._id),
@@ -156,7 +177,7 @@ export default function CountersPage() {
             className="h-10 rounded-lg border border-gray-300 bg-white px-3 text-sm text-gray-700 outline-none focus:border-teal-500"
           >
             <option value="">Select department</option>
-            {departments.map((d) => (
+            {(Array.isArray(departments) ? departments : []).map((d) => (
               <option key={d._id} value={d._id}>
                 {d.name}
               </option>
@@ -205,7 +226,7 @@ export default function CountersPage() {
                 </td>
               </tr>
             )}
-            {counters.map((counter) => (
+            {(Array.isArray(counters) ? counters : []).map((counter) => (
               <tr
                 key={counter._id}
                 className="border-t border-gray-100 text-sm"
@@ -240,7 +261,10 @@ export default function CountersPage() {
                           className="h-9 w-40 rounded-lg border border-gray-300 bg-white px-2 text-sm text-gray-700 outline-none focus:border-teal-500"
                         >
                           <option value="">Unassigned</option>
-                          {assignableUsers.map((staff) => (
+                          {(Array.isArray(assignableUsers)
+                            ? assignableUsers
+                            : []
+                          ).map((staff) => (
                             <option key={staff._id} value={staff._id}>
                               {staff.name} ({staff.role})
                             </option>

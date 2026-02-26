@@ -10,11 +10,14 @@ import {
 ChartJS.register(CategoryScale, LinearScale, BarElement, Tooltip);
 
 export default function PeakHoursChart({ dataPoints }) {
-  const labels = dataPoints.map((point) => point.hour);
-  const values = dataPoints.map((point) => point.value);
-  const colors = dataPoints.map((point) => (point.active ? "#0d9488" : "#e5e7eb"));
+  const safeDataPoints = Array.isArray(dataPoints) ? dataPoints : [];
+  const labels = safeDataPoints.map((point) => point.hour);
+  const values = safeDataPoints.map((point) => point.value);
+  const colors = safeDataPoints.map((point) =>
+    point.active ? "#0d9488" : "#e5e7eb",
+  );
 
-  const peak = dataPoints.reduce(
+  const peak = safeDataPoints.reduce(
     (acc, point) => (point.value > acc.value ? point : acc),
     { hour: "--", value: 0, active: false }
   );
@@ -44,7 +47,8 @@ export default function PeakHoursChart({ dataPoints }) {
       x: {
         grid: { display: false },
         ticks: {
-          color: (ctx) => (dataPoints[ctx.index]?.active ? "#0d9488" : "#9ca3af"),
+          color: (ctx) =>
+            safeDataPoints[ctx.index]?.active ? "#0d9488" : "#9ca3af",
           font: { size: 11, weight: "500" },
         },
         border: { display: false },

@@ -22,7 +22,12 @@ export default function DepartmentsPage() {
     setError("");
     try {
       const list = await adminApi.getDepartments();
-      setDepartments(list || []);
+      const departmentsArr = Array.isArray(list)
+        ? list
+        : Array.isArray(list?.departments)
+          ? list.departments
+          : [];
+      setDepartments(departmentsArr);
     } catch (err) {
       const errorMsg = err.message || "Failed to load departments";
       setError(errorMsg);
