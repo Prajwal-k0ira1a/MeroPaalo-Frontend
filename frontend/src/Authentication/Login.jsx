@@ -7,12 +7,10 @@ import { Input } from "./components/Input";
 import { LeftSidebar } from "./components/LeftSidebar";
 import { authService } from "./authService";
 
-const USER_TYPES = ["Staff", "Admin"];
 const AUTH_USER_STORAGE_KEY = "meropaalo_auth_user";
 
 export const Login = () => {
   const navigate = useNavigate();
-  const [userType, setUserType] = useState("Staff");
   const [formData, setFormData] = useState({ email: "", password: "" });
   const [showPass, setShowPass] = useState(false);
   const [rememberMe, setRememberMe] = useState(false);
@@ -32,9 +30,14 @@ export const Login = () => {
     const loadingToast = toast.loading("Logging in...");
     try {
       const user = await authService.login(formData.email, formData.password);
+
+      if (!user) {
+        throw new Error("Invalid login response. Please try again.");
+      }
+
       localStorage.setItem(AUTH_USER_STORAGE_KEY, JSON.stringify(user));
       toast.dismiss(loadingToast);
-      toast.success(`Welcome back, ${user.name || user.email}!`);
+      toast.success(`Welcome back, ${user.name || user.email || "User"}!`);
       // Redirect based on role returned by the server
       if (user.role === "admin") {
         navigate("/admin");
@@ -80,23 +83,6 @@ export const Login = () => {
             <h1 className="text-2xl font-extrabold text-slate-900 mb-1 tracking-tight">
               Sign in to your account
             </h1>
-          </div>
-
-          {/* Role tab switcher */}
-          <div className="flex gap-1.5 bg-slate-100 p-1 rounded-xl mb-4">
-            {USER_TYPES.map((type) => (
-              <button
-                key={type}
-                onClick={() => setUserType(type)}
-                className={`flex-1 py-2 rounded-lg text-sm font-semibold transition-all duration-200 ${
-                  userType === type
-                    ? "bg-white text-teal-700 shadow border border-slate-200"
-                    : "text-slate-500 hover:text-slate-800"
-                }`}
-              >
-                {type}
-              </button>
-            ))}
           </div>
 
           {/* Form */}
