@@ -8,19 +8,10 @@ import LiveQueueStats from "./components/LiveQueueStats";
 import CheckInCard from "./components/CheckInCard";
 import TokenSuccessCard from "./components/TokenSuccessCard";
 import ErrorBanner from "./components/ErrorBanner";
-import { apiRequest } from "../lib/apiClient";
+import apiClient from "../api/apiClient";
 
 const TOKEN_STORAGE_KEY = "meropaalo_customer_token";
 const CUSTOMER_LOGIN_KEY = "meropaalo_customer_username";
-
-// Seed data for demonstration & development fallback
-const MOCK_DATA = {
-  institutionName: "City General Hospital",
-  queueName: "Outpatient Registration",
-  estimatedWaitMinutes: 18,
-  aheadCount: 12,
-  queueStatus: "active",
-};
 
 export const JoinPage = () => {
   const [searchParams] = useSearchParams();
@@ -57,9 +48,9 @@ export const JoinPage = () => {
 
   useEffect(() => {
     const fetchQueueInfo = async () => {
-      // If no params are provided, we show mock data for demonstration
+      // If no params are provided, do not fetch or set queue info
       if (!canQuery) {
-        setQueueInfo(MOCK_DATA);
+        setQueueInfo(null);
         setIsLoading(false);
         return;
       }
@@ -68,14 +59,13 @@ export const JoinPage = () => {
       setError("");
 
       try {
-        const json = await apiRequest(`/public/queue/${department}/info`);
-        setQueueInfo(json.data);
+        const data = await apiClient.get(`/public/queue/${department}/info`);
+        setQueueInfo(data.data);
       } catch (err) {
-        // Fallback to mock on network error
         const errorMsg = err.message || "Could not load queue information";
         toast.error(errorMsg);
         setError(errorMsg);
-        setQueueInfo(MOCK_DATA);
+        setQueueInfo(null);
       } finally {
         setIsLoading(false);
       }
@@ -89,11 +79,8 @@ export const JoinPage = () => {
     setError("");
     const loadingToast = toast.loading("Joining queue...");
     try {
-      const json = await apiRequest("/tokens/issue", {
-        method: "POST",
-        body: { department },
-      });
-      setToken(json.data);
+      const data = await apiClient.post("/tokens/issue", { department });
+      setToken(data.data);
       localStorage.setItem(
         TOKEN_STORAGE_KEY,
         JSON.stringify({
