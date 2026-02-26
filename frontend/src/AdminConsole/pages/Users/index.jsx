@@ -22,8 +22,8 @@ export default function UsersPage() {
         adminApi.getUsers(roleFilter || undefined),
         adminApi.getDepartments(),
       ]);
-      setUsers(list || []);
-      setDepartments(deptList || []);
+      setUsers(Array.isArray(list) ? list : []);
+      setDepartments(Array.isArray(deptList) ? deptList : []);
       setPendingRoles({});
       setPendingDepartments({});
     } catch (err) {
