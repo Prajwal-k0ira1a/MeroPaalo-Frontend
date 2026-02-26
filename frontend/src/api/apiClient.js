@@ -43,7 +43,11 @@ apiClient.interceptors.request.use(
 apiClient.interceptors.response.use(
   (response) => {
     // Just return the data part of the response for simplicity in components
-    return response.data;
+    const payload = response.data;
+    if (payload && typeof payload === "object" && "data" in payload) {
+      return payload.data;
+    }
+    return payload;
   },
   (error) => {
     // Centralized error logging or alerts
