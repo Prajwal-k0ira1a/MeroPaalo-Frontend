@@ -128,29 +128,6 @@ export default function TokenPage() {
     };
   }, [departmentId]);
 
-  const handleCancel = async () => {
-    if (!tokenId) return;
-    if (
-      !window.confirm("Are you sure you want to cancel your spot in the queue?")
-    )
-      return;
-
-    const loadingToast = toast.loading("Canceling token...");
-    try {
-      await apiClient.patch(`/tokens/${tokenId}/cancel`);
-      setError("");
-      toast.dismiss(loadingToast);
-      toast.success("Token cancelled successfully!");
-    } catch (err) {
-      const errorMsg =
-        err.message ||
-        "This token cannot be cancelled from customer view. Please contact staff.";
-      setError(errorMsg);
-      toast.dismiss(loadingToast);
-      toast.error(errorMsg);
-    }
-  };
-
   const params = searchParams.toString() ? `?${searchParams.toString()}` : "";
 
   return (
@@ -196,7 +173,7 @@ export default function TokenPage() {
           />
 
           <div className="pt-0.5">
-            <TokenActions onCancel={handleCancel} />
+            <TokenActions />
           </div>
         </div>
       </main>
